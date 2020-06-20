@@ -2,6 +2,7 @@ package rabbit
 
 import (
 	"fmt"
+	"github.com/ltoddy/rabbit/types"
 	"log"
 	"net/http"
 	"path"
@@ -49,14 +50,14 @@ func NewRabbit(addr string) *Rabbit {
 	return rabbit
 }
 
-func (r *Rabbit) GenerateNest(prefix Path) *Nest {
+func (r *Rabbit) GenerateNest(prefix types.Path) *Nest {
 	nest := NewNest(prefix, r)
 	return nest
 }
 
-func (r *Rabbit) register(method string, p Path, handler Handler) {
+func (r *Rabbit) register(method string, p types.Path, handler Handler) {
 	if !strings.HasPrefix(string(p), "/") {
-		p = Path(path.Join("/", string(p)))
+		p = types.Path(path.Join("/", string(p)))
 	}
 
 	key := fmt.Sprintf("%s-%s", method, p)
@@ -65,6 +66,5 @@ func (r *Rabbit) register(method string, p Path, handler Handler) {
 
 func (r *Rabbit) Run() {
 	log.Printf("Server start run at: %s\n", r.Addr)
-	log.Printf("r.routes is: %+v\n", r.routes)
 	log.Fatal(http.ListenAndServe(r.Addr, r))
 }
