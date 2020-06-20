@@ -1,4 +1,4 @@
-package rabbit
+package types
 
 import "path"
 

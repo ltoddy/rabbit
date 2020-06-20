@@ -3,6 +3,7 @@ package rabbit
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ltoddy/rabbit/types"
 	"net/http"
 )
 
@@ -43,4 +44,4 @@ func (c *Context) Text(content string) {
 	}
 }
 
-func (c *Context) Redirect(p Path) {}
+func (c *Context) Redirect(p types.Path) {}

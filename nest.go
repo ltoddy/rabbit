@@ -1,62 +1,63 @@
 package rabbit
 
 import (
+	"github.com/ltoddy/rabbit/types"
 	"net/http"
 )
 
 type Nest struct {
-	prefix Path
+	prefix types.Path
 	rabbit *Rabbit
 }
 
-func NewNest(prefix Path, rabbit *Rabbit) *Nest {
+func NewNest(prefix types.Path, rabbit *Rabbit) *Nest {
 	nest := new(Nest)
 	nest.prefix = prefix
 	nest.rabbit = rabbit
 	return nest
 }
 
-func (n *Nest) Get(p Path, handler HandlerFunc) {
+func (n *Nest) Get(p types.Path, handler HandlerFunc) {
 	p = n.prefix.Append(p)
 	n.rabbit.register(http.MethodGet, p, handler)
 }
 
-func (n *Nest) Post(p Path, handler HandlerFunc) {
+func (n *Nest) Post(p types.Path, handler HandlerFunc) {
 	p = n.prefix.Append(p)
 	n.rabbit.register(http.MethodPost, p, handler)
 }
 
-func (n *Nest) Delete(p Path, handler HandlerFunc) {
+func (n *Nest) Delete(p types.Path, handler HandlerFunc) {
 	p = n.prefix.Append(p)
 	n.rabbit.register(http.MethodDelete, p, handler)
 }
 
-func (n *Nest) Patch(p Path, handler HandlerFunc) {
+func (n *Nest) Patch(p types.Path, handler HandlerFunc) {
 	p = n.prefix.Append(p)
 	n.rabbit.register(http.MethodPatch, p, handler)
 }
 
-func (n *Nest) Put(p Path, handler HandlerFunc) {
+func (n *Nest) Put(p types.Path, handler HandlerFunc) {
 	p = n.prefix.Append(p)
 	n.rabbit.register(http.MethodPut, p, handler)
 }
 
-func (n *Nest) Connect(p Path, handler HandlerFunc) {
+func (n *Nest) Connect(p types.Path, handler HandlerFunc) {
 	p = n.prefix.Append(p)
 	n.rabbit.register(http.MethodConnect, p, handler)
 }
 
-func (n *Nest) Head(p Path, handler HandlerFunc) {
+func (n *Nest) Head(p types.Path, handler HandlerFunc) {
 	p = n.prefix.Append(p)
 	n.rabbit.register(http.MethodHead, p, handler)
 }
 
-func (n *Nest) Trace(p Path, handler HandlerFunc) {
+func (n *Nest) Trace(p types.Path, handler HandlerFunc) {
 	p = n.prefix.Append(p)
 	n.rabbit.register(http.MethodTrace, p, handler)
 }
 
-func (n *Nest) Options(p Path, handler HandlerFunc) {
+func (n *Nest) Options(p types.Path, handler HandlerFunc) {
 	p = n.prefix.Append(p)
 	n.rabbit.register(http.MethodOptions, p, handler)
 }
