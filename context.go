@@ -3,19 +3,20 @@ package rabbit
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ltoddy/rabbit/types"
 	"net/http"
 )
 
 type Context struct {
 	writer  http.ResponseWriter
 	request *http.Request
+	Params  map[string]string
 }
 
-func NewContext(writer http.ResponseWriter, request *http.Request) *Context {
+func newContext(writer http.ResponseWriter, request *http.Request, params map[string]string) *Context {
 	ctx := new(Context)
 	ctx.writer = writer
 	ctx.request = request
+	ctx.Params = params
 	return ctx
 }
 
@@ -44,4 +45,6 @@ func (c *Context) Text(content string) {
 	}
 }
 
-func (c *Context) Redirect(p types.Path) {}
+func (c *Context) Redirect(p Path) {
+	// TODO
+}
