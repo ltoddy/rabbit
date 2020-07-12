@@ -1,8 +1,7 @@
-package rabbit
+package response
 
 import (
 	"encoding/json"
-	"github.com/ltoddy/rabbit/response"
 	"net/http"
 )
 
@@ -28,15 +27,15 @@ type Response interface {
 	Body() []byte
 }
 
-func JsonResponse(v Any) Response {
+func JsonResponse(v interface{}) Response {
 	data, err := json.Marshal(v)
 	if err != nil {
-		return response.NewJsonResponse([]byte(err.Error()), http.StatusInternalServerError)
+		return NewJsonResponse([]byte(err.Error()), http.StatusInternalServerError)
 	}
 
-	return response.NewJsonResponse(data, http.StatusOK)
+	return NewJsonResponse(data, http.StatusOK)
 }
 
 func TextResponse(content string) Response {
-	return response.NewTextResponse(content, 200)
+	return NewTextResponse(content, 200)
 }

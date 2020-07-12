@@ -1,38 +1,36 @@
 package rabbit
 
 import (
-	"fmt"
+	"github.com/ltoddy/rabbit/Router"
+	"github.com/ltoddy/rabbit/handler"
 	"log"
 	"net/http"
 )
 
-type Handler interface {
-	Serve(*http.Request) Response
-}
-
-type HandlerFunc func(*http.Request) Response
-
-func (f HandlerFunc) Serve(r *http.Request) Response {
-	return f(r)
-}
-
 type Rabbit struct {
 	Addr   string
-	router map[string]Handler
+	Router *router.Router
 }
 
-func (r Rabbit) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func NewRabbit(addr string) *Rabbit {
+	rabbit := new(Rabbit)
+	rabbit.Addr = addr
+	rabbit.Router = router.NewRouter()
+	return rabbit
+}
+
+func (r *Rabbit) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	method := request.Method
 	p := request.URL.Path
 	log.Printf("incmoing request: %-7s %s\n", method, p)
-	key := fmt.Sprintf("%s-%s", method, p)
 
-	handler, ok := r.router[key]
-	if !ok {
+	handle := r.Router.Inquiry(method, p)
+	if handle == nil {
 		writer.WriteHeader(http.StatusNotFound)
 		return
 	}
-	response := handler.Serve(request)
+
+	response := handle.Serve(request)
 
 	writer.WriteHeader(response.StatusCode())
 	for key, value := range response.Header() {
@@ -41,16 +39,40 @@ func (r Rabbit) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	_, _ = writer.Write(response.Body())
 }
 
-func NewRabbit(addr string) *Rabbit {
-	rabbit := new(Rabbit)
-	rabbit.Addr = addr
-	rabbit.router = make(map[string]Handler)
-	return rabbit
+func (r *Rabbit) Get(path string, f handler.HandlerFunction) {
+	r.Router.Register(http.MethodGet, path, f)
 }
 
-func (r *Rabbit) Get(p string, f HandlerFunc) {
-	key := fmt.Sprintf("%s-%s", http.MethodGet, p)
-	r.router[key] = f
+func (r *Rabbit) Head(path string, f handler.HandlerFunction) {
+	r.Router.Register(http.MethodHead, path, f)
+}
+
+func (r *Rabbit) Post(path string, f handler.HandlerFunction) {
+	r.Router.Register(http.MethodPost, path, f)
+}
+
+func (r *Rabbit) Put(path string, f handler.HandlerFunction) {
+	r.Router.Register(http.MethodPut, path, f)
+}
+
+func (r *Rabbit) Patch(path string, f handler.HandlerFunction) {
+	r.Router.Register(http.MethodPatch, path, f)
+}
+
+func (r *Rabbit) Delete(path string, f handler.HandlerFunction) {
+	r.Router.Register(http.MethodDelete, path, f)
+}
+
+func (r *Rabbit) Connect(path string, f handler.HandlerFunction) {
+	r.Router.Register(http.MethodConnect, path, f)
+}
+
+func (r *Rabbit) Options(path string, f handler.HandlerFunction) {
+	r.Router.Register(http.MethodOptions, path, f)
+}
+
+func (r *Rabbit) Trace(path string, f handler.HandlerFunction) {
+	r.Router.Register(http.MethodTrace, path, f)
 }
 
 func (r *Rabbit) Run() {
