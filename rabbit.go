@@ -4,61 +4,53 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"path"
-	"strings"
 )
 
 type Handler interface {
-	Serve(ctx *Context)
+	Serve(*http.Request) Response
 }
 
-type HandlerFunc func(ctx *Context)
+type HandlerFunc func(*http.Request) Response
 
-func (f HandlerFunc) Serve(ctx *Context) {
-	f(ctx)
+func (f HandlerFunc) Serve(r *http.Request) Response {
+	return f(r)
 }
 
 type Rabbit struct {
 	Addr   string
-	router *router
-	*Nest
-	nests []*Nest
+	router map[string]Handler
 }
 
 func (r Rabbit) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	method := request.Method
 	p := request.URL.Path
 	log.Printf("incmoing request: %-7s %s\n", method, p)
+	key := fmt.Sprintf("%s-%s", method, p)
 
-	node, params := r.router.search(method, Path(p))
-	if node != nil {
-		ctx := newContext(writer, request, params)
-		node.handler.Serve(ctx)
-	} else {
-		_, _ = fmt.Fprintln(writer, "404. That's an error.")
+	handler, ok := r.router[key]
+	if !ok {
+		writer.WriteHeader(http.StatusNotFound)
+		return
 	}
+	response := handler.Serve(request)
+
+	writer.WriteHeader(response.StatusCode())
+	for key, value := range response.Header() {
+		writer.Header().Set(key, value)
+	}
+	_, _ = writer.Write(response.Body())
 }
 
 func NewRabbit(addr string) *Rabbit {
 	rabbit := new(Rabbit)
 	rabbit.Addr = addr
-	rabbit.router = newRouter()
-	rabbit.nests = make([]*Nest, 0, 128)
-	rabbit.Nest = NewNest("/", rabbit)
+	rabbit.router = make(map[string]Handler)
 	return rabbit
 }
 
-func (r *Rabbit) GenerateNest(prefix Path) *Nest {
-	nest := NewNest(prefix, r)
-	return nest
-}
-
-func (r *Rabbit) register(method string, p Path, handler Handler) {
-	if !strings.HasPrefix(string(p), "/") {
-		p = Path(path.Join("/", string(p)))
-	}
-
-	r.router.register(method, p, handler)
+func (r *Rabbit) Get(p string, f HandlerFunc) {
+	key := fmt.Sprintf("%s-%s", http.MethodGet, p)
+	r.router[key] = f
 }
 
 func (r *Rabbit) Run() {
