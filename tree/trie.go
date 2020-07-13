@@ -2,6 +2,8 @@ package tree
 
 import (
 	"github.com/ltoddy/rabbit/handler"
+	"github.com/ltoddy/rabbit/request"
+	"regexp"
 	"strings"
 )
 
@@ -27,20 +29,31 @@ func (tree *TrieTree) Insert(p string, handler handler.Handler) {
 	crawler.handler = handler
 }
 
-func (tree *TrieTree) Search(p string) handler.Handler {
+func (tree *TrieTree) Search(p string) (handler.Handler, request.Params) {
 	crawler := tree.root
+	params := make(request.Params)
 	subpaths := strings.Split(p, "/")
 	for _, subpath := range subpaths {
 		if _, found := crawler.children[subpath]; !found {
-			return nil
+			return nil, nil
 		}
 
 		crawler = crawler.children[subpath]
 	}
 
 	if crawler.end {
-		return crawler.handler
+		return crawler.handler, params
 	}
 
-	return nil
+	return nil, nil
+}
+
+func isDynamicSubPath(subpath string) bool {
+	return regexp.MustCompile(`^<\w+>$`).MatchString(subpath)
+}
+
+func interceptDynamicParam(subpath string) string {
+	subpath = strings.TrimPrefix(subpath, "<")
+	subpath = strings.TrimSuffix(subpath, ">")
+	return subpath
 }

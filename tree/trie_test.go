@@ -1,15 +1,15 @@
 package tree
 
 import (
-	"github.com/ltoddy/rabbit"
-	"net/http"
+	"github.com/ltoddy/rabbit/request"
+	"github.com/ltoddy/rabbit/response"
 	"testing"
 )
 
 type TestHandler struct{}
 
-func (t TestHandler) Serve(request *http.Request) rabbit.Response {
-	return rabbit.TextResponse("hello world")
+func (t TestHandler) Serve(request *request.Request) response.Response {
+	return response.TextResponse("hello world")
 }
 
 func TestTrieTree(t *testing.T) {
@@ -19,7 +19,9 @@ func TestTrieTree(t *testing.T) {
 
 		tree.Insert("/hello/world", handler)
 
-		if handler != tree.Search("/hello/world") {
+		actual, _ := tree.Search("/hello/world")
+
+		if handler != actual {
 			t.Fail()
 		}
 	})
@@ -27,8 +29,43 @@ func TestTrieTree(t *testing.T) {
 	t.Run("should get nil given an empty trie tree", func(t *testing.T) {
 		tree := NewTrieTree()
 
-		if tree.Search("/hello/world") != nil {
+		actual, _ := tree.Search("/hello/world")
+		if actual != nil {
 			t.Fail()
 		}
+	})
+}
+
+func TestIsDynamicSubPath(t *testing.T) {
+	t.Run("should return true", func(t *testing.T) {
+		subpath := "<name>"
+
+		if isDynamicSubPath(subpath) == false {
+			t.Fail()
+		}
+	})
+
+	t.Run("should return false", func(t *testing.T) {
+		subpaths := []string{"<<name>", "some", "<123sada"}
+
+		for _, subpath := range subpaths {
+			if isDynamicSubPath(subpath) {
+				t.Fail()
+			}
+		}
+	})
+}
+
+func TestInterceptDynamicParam(t *testing.T) {
+	t.Run("should return both side angle brackets ", func(t *testing.T) {
+		subpath := "<name>"
+		expected := "name"
+
+		actual := interceptDynamicParam(subpath)
+
+		if expected != actual {
+			t.Errorf("expected: %s, got: %s\n", expected, actual)
+		}
+
 	})
 }
