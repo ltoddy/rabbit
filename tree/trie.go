@@ -21,7 +21,10 @@ func (tree *TrieTree) Insert(p string, handler handler.Handler) {
 	subpaths := strings.Split(p, "/")
 	for _, subpath := range subpaths {
 		if _, found := crawler.children[subpath]; !found {
-			crawler.children[subpath] = newTrieNode()
+			node := newTrieNode()
+			node.path = subpath
+			node.dynamic = isDynamicSubPath(subpath)
+			crawler.children[subpath] = node
 		}
 		crawler = crawler.children[subpath]
 	}
@@ -35,7 +38,7 @@ func (tree *TrieTree) Search(p string) (handler.Handler, request.Params) {
 	subpaths := strings.Split(p, "/")
 	for _, subpath := range subpaths {
 		if _, found := crawler.children[subpath]; !found {
-			return nil, nil
+			return nil, params // TODO: should return params or nil?
 		}
 
 		crawler = crawler.children[subpath]
@@ -45,7 +48,7 @@ func (tree *TrieTree) Search(p string) (handler.Handler, request.Params) {
 		return crawler.handler, params
 	}
 
-	return nil, nil
+	return nil, params // TODO: should return params or nil?
 }
 
 func isDynamicSubPath(subpath string) bool {

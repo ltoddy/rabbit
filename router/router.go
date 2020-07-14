@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/ltoddy/rabbit/handler"
+	"github.com/ltoddy/rabbit/request"
 	"github.com/ltoddy/rabbit/tree"
 	"net/http"
 )
@@ -31,7 +32,7 @@ func (router *Router) Register(method string, path string, handler handler.Handl
 	root.Insert(path, handler)
 }
 
-func (router *Router) Inquiry(method string, path string) handler.Handler {
+func (router *Router) Inquiry(method string, path string) (handler.Handler, request.Params) {
 	root := router.roots[method]
 
 	return root.Search(path)
