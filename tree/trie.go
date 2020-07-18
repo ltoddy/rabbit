@@ -2,61 +2,49 @@ package tree
 
 import (
 	"github.com/ltoddy/rabbit/handler"
-	"github.com/ltoddy/rabbit/request"
-	"regexp"
 	"strings"
 )
 
-// Trie tree
 type TrieTree struct {
 	root *trieNode
 }
 
 func NewTrieTree() *TrieTree {
-	return &TrieTree{root: newTrieNode()}
+	dummy := new(trieNode)
+	tree := new(TrieTree)
+	tree.root = dummy
+	return tree
 }
 
-func (tree *TrieTree) Insert(p string, handler handler.Handler) {
-	crawler := tree.root
-	subpaths := strings.Split(p, "/")
-	for _, subpath := range subpaths {
-		if _, found := crawler.children[subpath]; !found {
-			node := newTrieNode()
-			node.path = subpath
-			node.dynamic = isDynamicSubPath(subpath)
-			crawler.children[subpath] = node
-		}
-		crawler = crawler.children[subpath]
-	}
-	crawler.end = true
-	crawler.handler = handler
+func (tree *TrieTree) Insert(path string, fn handler.Handler) {
+	subpaths := splitPath(path)
+	tree.root.Insert(path, subpaths, fn, 0)
 }
 
-func (tree *TrieTree) Search(p string) (handler.Handler, request.Params) {
-	crawler := tree.root
-	params := make(request.Params)
-	subpaths := strings.Split(p, "/")
-	for _, subpath := range subpaths {
-		if _, found := crawler.children[subpath]; !found {
-			return nil, params // TODO: should return params or nil?
+func (tree *TrieTree) Search(path string) (handler.Handler, map[string]string) {
+	subpaths := splitPath(path)
+	params := make(map[string]string)
+	node := tree.root.Search(subpaths, 0)
+
+	if node != nil {
+		for index, subpath := range splitPath(node.fullpath) {
+			if isDynamicSubPath(subpath) {
+				params[interceptDynamicParam(subpath)] = subpaths[index]
+			}
 		}
 
-		crawler = crawler.children[subpath]
+		return node.fn, params
 	}
 
-	if crawler.end {
-		return crawler.handler, params
+	return nil, nil
+}
+
+func splitPath(path string) []string {
+	subpaths := make([]string, 0)
+	for _, subpath := range strings.Split(path, "/") {
+		if subpath != "" {
+			subpaths = append(subpaths, subpath)
+		}
 	}
-
-	return nil, params // TODO: should return params or nil?
-}
-
-func isDynamicSubPath(subpath string) bool {
-	return regexp.MustCompile(`^<\w+>$`).MatchString(subpath)
-}
-
-func interceptDynamicParam(subpath string) string {
-	subpath = strings.TrimPrefix(subpath, "<")
-	subpath = strings.TrimSuffix(subpath, ">")
-	return subpath
+	return subpaths
 }

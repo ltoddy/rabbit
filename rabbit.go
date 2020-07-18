@@ -1,9 +1,9 @@
 package rabbit
 
 import (
-	"github.com/ltoddy/rabbit/Router"
 	"github.com/ltoddy/rabbit/handler"
 	"github.com/ltoddy/rabbit/request"
+	"github.com/ltoddy/rabbit/router"
 	"log"
 	"net/http"
 )

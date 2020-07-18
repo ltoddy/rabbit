@@ -22,8 +22,12 @@ func TestStaticRouter(t *testing.T) {
 
 		actual, params := router.Inquiry(http.MethodGet, "/hello/world")
 
-		if actual != h || len(params) != 0 {
-			t.Errorf("handler: expected handler, got %#v\nparams: expected {}, got %#v\n", actual, params)
+		if actual != h {
+			t.Errorf("handler: expected handler, got %#v\n", actual)
+		}
+
+		if len(params) != 0 {
+			t.Errorf("params: expected {}, got %#v\n", params)
 		}
 	})
 
@@ -50,4 +54,41 @@ func TestStaticRouter(t *testing.T) {
 	})
 }
 
-//func TestDynamicRouter(t *testing.T) {}
+func TestDynamicRouter(t *testing.T) {
+	h1 := handle{}
+	h2 := handle{}
+
+	t.Run("", func(t *testing.T) {
+		router := NewRouter()
+		router.Register(http.MethodGet, "/hello/world", h1)
+		router.Register(http.MethodGet, "/hello/world/<name>", h2)
+		expectedParams := request.Params{"name": "ltoddy"}
+
+		actualHandler, actualParams := router.Inquiry(http.MethodGet, "/hello/world/ltoddy")
+
+		if len(actualParams) != len(expectedParams) && expectedParams["name"] != actualParams["name"] {
+			t.Errorf("expected: %#v, got: %#v\n", expectedParams, actualParams)
+		}
+
+		if actualHandler != h2 {
+			t.Errorf("expected: %#v, got: %#v\n", h2, actualHandler)
+		}
+	})
+
+	t.Run("", func(t *testing.T) {
+		router := NewRouter()
+		router.Register(http.MethodGet, "/<id>/<name>", h1)
+		expectedParams := request.Params{"id": "10", "name": "ltoddy"}
+
+		actualHandler, actualParams := router.Inquiry(http.MethodGet, "/10/ltoddy")
+
+		if actualHandler != h1 {
+			t.Errorf("expected: %#v, got: %#v\n", h1, actualHandler)
+		}
+
+		if len(actualParams) != 2 || actualParams["id"] != expectedParams["id"] || actualParams["name"] != expectedParams["name"] {
+			t.Errorf("expected: %#v, got: %#v\n", expectedParams, actualParams)
+
+		}
+	})
+}
