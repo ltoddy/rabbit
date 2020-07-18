@@ -25,14 +25,14 @@ func (rabbit *Rabbit) ServeHTTP(writer http.ResponseWriter, r *http.Request) {
 	p := r.URL.Path
 	log.Printf("incmoing request: %-7s %s\n", method, p)
 
-	handle, _ := rabbit.Router.Inquiry(method, p)
+	handle, params := rabbit.Router.Inquiry(method, p)
 	if handle == nil {
 		writer.WriteHeader(http.StatusNotFound)
 		return
 	}
 	req := &request.Request{
 		Request: r,
-		Params:  nil,
+		Params:  params,
 	}
 
 	response := handle.Serve(req)

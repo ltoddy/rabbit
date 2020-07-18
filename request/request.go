@@ -10,3 +10,10 @@ type Request struct {
 }
 
 type Params map[string]string
+
+func (p Params) Get(field string) string {
+	if value, ok := p[field]; ok {
+		return value
+	}
+	return ""
+}

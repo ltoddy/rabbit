@@ -9,14 +9,8 @@ import (
 func main() {
 	r := rabbit.NewRabbit(":2333")
 
-	r.Get("/", func(request *request.Request) response.Response {
-		return response.JsonResponse(rabbit.J{
-			"hello": "world",
-		})
-	})
-
-	r.Get("/hello", func(request *request.Request) response.Response {
-		return response.TextResponse("Hello world")
+	r.Get("/greet/<name>", func(request *request.Request) response.Response {
+		return response.JsonResponse(rabbit.J{"name": request.Params.Get("name")})
 	})
 
 	r.Run()
