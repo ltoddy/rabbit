@@ -34,7 +34,7 @@ func (rabbit *Rabbit) ServeHTTP(writer http.ResponseWriter, r *http.Request) {
 		Request: r,
 		Params:  params,
 	}
-
+	defer recovery(writer)
 	response := handle.Serve(req)
 
 	writer.WriteHeader(response.StatusCode())

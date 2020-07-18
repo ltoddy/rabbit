@@ -9,6 +9,10 @@ import (
 func main() {
 	r := rabbit.NewRabbit(":2333")
 
+	r.Get("/index", func(r *request.Request) response.Response {
+		panic("this is a error")
+	})
+
 	r.Get("/greet/<name>", func(request *request.Request) response.Response {
 		return response.JsonResponse(rabbit.J{"name": request.Params.Get("name")})
 	})
