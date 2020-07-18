@@ -5,7 +5,7 @@ type jsonResponse struct {
 	code int // http status code
 }
 
-func NewJsonResponse(data []byte, code int) *jsonResponse {
+func newJsonResponse(data []byte, code int) *jsonResponse {
 	return &jsonResponse{data: data, code: code}
 }
 

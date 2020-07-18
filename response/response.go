@@ -30,12 +30,16 @@ type Response interface {
 func JsonResponse(v interface{}) Response {
 	data, err := json.Marshal(v)
 	if err != nil {
-		return NewJsonResponse([]byte(err.Error()), http.StatusInternalServerError)
+		return newJsonResponse([]byte(err.Error()), http.StatusInternalServerError)
 	}
 
-	return NewJsonResponse(data, http.StatusOK)
+	return newJsonResponse(data, http.StatusOK)
 }
 
 func TextResponse(content string) Response {
-	return NewTextResponse(content, 200)
+	return newTextResponse(content, 200)
+}
+
+func RawResponse(code int, header map[string]string, body []byte) Response {
+	return newRawResponse(code, header, body)
 }

@@ -5,7 +5,7 @@ type textResponse struct {
 	code    int // http status code
 }
 
-func NewTextResponse(content string, code int) *textResponse {
+func newTextResponse(content string, code int) *textResponse {
 	return &textResponse{content: content, code: code}
 }
 
