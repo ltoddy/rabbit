@@ -60,6 +60,17 @@ func TestDynamicRouter(t *testing.T) {
 
 	t.Run("", func(t *testing.T) {
 		router := NewRouter()
+		router.Register(http.MethodGet, "/", h1)
+
+		actualHandler, _ := router.Inquiry(http.MethodGet, "/")
+
+		if actualHandler != h1 {
+			t.Errorf("expected: %#v, got: %#v\n", h1, actualHandler)
+		}
+	})
+
+	t.Run("", func(t *testing.T) {
+		router := NewRouter()
 		router.Register(http.MethodGet, "/hello/world", h1)
 		router.Register(http.MethodGet, "/hello/world/<name>", h2)
 		expectedParams := request.Params{"name": "ltoddy"}

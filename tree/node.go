@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// TODO: 数据结构字段有点混乱，有空来改改
 type trieNode struct {
 	fullpath string
 	subpath  string
@@ -29,6 +30,7 @@ func NewTrieNode(fullpath string, subpath string, fn handler.Handler) *trieNode 
 func (node *trieNode) Insert(fullpath string, subpaths []string, fn handler.Handler, level int) {
 	if len(subpaths) == level {
 		node.fullpath = fullpath
+		node.fn = fn
 		return
 	}
 
@@ -43,9 +45,9 @@ func (node *trieNode) Insert(fullpath string, subpaths []string, fn handler.Hand
 
 func (node *trieNode) Search(subpaths []string, level int) *trieNode {
 	if len(subpaths) == level || node.dynamic {
-		if node.subpath == "" {
-			return nil
-		}
+		//if node.subpath == "" {
+		//	return nil
+		//}
 		return node
 	}
 

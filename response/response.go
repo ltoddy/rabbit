@@ -43,3 +43,18 @@ func TextResponse(content string) Response {
 func RawResponse(code int, header map[string]string, body []byte) Response {
 	return newRawResponse(code, header, body)
 }
+
+func Redirect(path string) Response {
+	//TODO
+	panic("unimplemented!")
+}
+
+func Fail(code int) Response {
+	//TODO
+	panic("unimplemented!")
+}
+
+func Render(tmpl string, args interface{}) Response {
+	//TODO
+	panic("unimplemented!")
+}
