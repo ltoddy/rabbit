@@ -14,7 +14,7 @@ func main() {
 	})
 
 	r.Get("/index", func(r *request.Request) response.Response {
-		panic("this is a error")
+		return response.Redirect("/")
 	})
 
 	r.Get("/greet/<name>", func(request *request.Request) response.Response {

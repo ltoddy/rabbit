@@ -9,6 +9,13 @@ type Request struct {
 	Params Params
 }
 
+func NewRequest(r *http.Request, params Params) *Request {
+	return &Request{
+		Request: r,
+		Params:  params,
+	}
+}
+
 type Params map[string]string
 
 func (p Params) Get(field string) string {

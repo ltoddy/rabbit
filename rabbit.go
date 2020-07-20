@@ -30,17 +30,15 @@ func (rabbit *Rabbit) ServeHTTP(writer http.ResponseWriter, r *http.Request) {
 		writer.WriteHeader(http.StatusNotFound)
 		return
 	}
-	req := &request.Request{
-		Request: r,
-		Params:  params,
-	}
+	req := request.NewRequest(r, params)
 	defer recovery(writer)
 	response := handle.Serve(req)
 
-	writer.WriteHeader(response.StatusCode())
+	h := writer.Header()
 	for key, value := range response.Header() {
-		writer.Header().Set(key, value)
+		h.Set(key, value)
 	}
+	writer.WriteHeader(response.StatusCode())
 	_, _ = writer.Write(response.Body())
 }
 

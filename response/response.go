@@ -45,8 +45,11 @@ func RawResponse(code int, header map[string]string, body []byte) Response {
 }
 
 func Redirect(path string) Response {
-	//TODO
-	panic("unimplemented!")
+	return RedirectWithCode(path, 302)
+}
+
+func RedirectWithCode(path string, code int) Response {
+	return newRedirectResponse(path, code)
 }
 
 func Fail(code int) Response {
