@@ -9,8 +9,9 @@ import (
 )
 
 type Rabbit struct {
-	Addr   string
-	Router *router.Router
+	Addr       string
+	Router     *router.Router
+	blueprints map[string]*Blueprint
 }
 
 func NewRabbit(addr string) *Rabbit {
@@ -76,6 +77,15 @@ func (rabbit *Rabbit) Options(path string, f handler.HandlerFunction) {
 
 func (rabbit *Rabbit) Trace(path string, f handler.HandlerFunction) {
 	rabbit.Router.Register(http.MethodTrace, path, f)
+}
+
+func (rabbit *Rabbit) RegisterBlueprint(blueprint *Blueprint) {
+	if blueprint != nil {
+		prefix := blueprint.prefix
+		rabbit.blueprints[prefix] = blueprint
+	} else {
+		log.Fatal(`register nil(blueprint) into rabbit`)
+	}
 }
 
 func (rabbit *Rabbit) Run() {
