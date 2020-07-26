@@ -80,11 +80,38 @@ func (rabbit *Rabbit) Trace(path string, f handler.HandlerFunction) {
 }
 
 func (rabbit *Rabbit) RegisterBlueprint(blueprint *Blueprint) {
-	if blueprint != nil {
-		prefix := blueprint.prefix
-		rabbit.blueprints[prefix] = blueprint
-	} else {
-		log.Fatal(`register nil(blueprint) into rabbit`)
+	for _, entry := range blueprint.get {
+		rabbit.Router.Register(http.MethodGet, entry.fullpath, entry.fn)
+	}
+	for _, entry := range blueprint.head {
+		rabbit.Router.Register(http.MethodHead, entry.fullpath, entry.fn)
+	}
+	for _, entry := range blueprint.post {
+		rabbit.Router.Register(http.MethodPost, entry.fullpath, entry.fn)
+	}
+	for _, entry := range blueprint.put {
+		rabbit.Router.Register(http.MethodPut, entry.fullpath, entry.fn)
+	}
+	for _, entry := range blueprint.patch {
+		rabbit.Router.Register(http.MethodPatch, entry.fullpath, entry.fn)
+	}
+	for _, entry := range blueprint.delete {
+		rabbit.Router.Register(http.MethodDelete, entry.fullpath, entry.fn)
+	}
+	for _, entry := range blueprint.connect {
+		rabbit.Router.Register(http.MethodConnect, entry.fullpath, entry.fn)
+	}
+	for _, entry := range blueprint.options {
+		rabbit.Router.Register(http.MethodOptions, entry.fullpath, entry.fn)
+	}
+	for _, entry := range blueprint.trace {
+		rabbit.Router.Register(http.MethodTrace, entry.fullpath, entry.fn)
+	}
+}
+
+func (rabbit *Rabbit) RegisterBlueprints(blueprints ...*Blueprint) {
+	for _, blueprint := range blueprints {
+		rabbit.RegisterBlueprint(blueprint)
 	}
 }
 

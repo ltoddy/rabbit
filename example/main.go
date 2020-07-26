@@ -21,5 +21,13 @@ func main() {
 		return response.JsonResponse(rabbit.J{"name": request.Params.Get("name")})
 	})
 
+	bp := rabbit.NewBlueprint("/api")
+	bp.Get("/user", func(r *request.Request) response.Response {
+		return response.JsonResponse(rabbit.J{
+			"Hello": "world",
+		})
+	})
+
+	r.RegisterBlueprints(bp)
 	r.Run()
 }

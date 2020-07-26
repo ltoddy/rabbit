@@ -1,6 +1,6 @@
 # Rabbit
 
-Rabbit is a Golang web framework that's written to go fast.
+Rabbit is pure Golang implementation for web framework that's written to go fast.
 
 The goal of the project is to provide a simple way to get up and running a highly
 performant HTTP server that is easy to build, to expand, and ultimately to scale.
