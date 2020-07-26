@@ -1,4 +1,4 @@
-package router
+package rabbit
 
 import (
 	"github.com/ltoddy/rabbit/request"
@@ -17,10 +17,10 @@ func TestStaticRouter(t *testing.T) {
 	h := handle{}
 
 	t.Run("should get handler when inquiry for router given correct http method and path", func(t *testing.T) {
-		router := NewRouter()
-		router.Register(http.MethodGet, "/hello/world", h)
+		router := newRouter()
+		router.register(http.MethodGet, "/hello/world", h)
 
-		actual, params := router.Inquiry(http.MethodGet, "/hello/world")
+		actual, params := router.inquiry(http.MethodGet, "/hello/world")
 
 		if actual != h {
 			t.Errorf("handler: expected handler, got %#v\n", actual)
@@ -32,10 +32,10 @@ func TestStaticRouter(t *testing.T) {
 	})
 
 	t.Run("should get nothing when inquiry for router given incorrect http method", func(t *testing.T) {
-		router := NewRouter()
-		router.Register(http.MethodGet, "/hello", h)
+		router := newRouter()
+		router.register(http.MethodGet, "/hello", h)
 
-		actual, params := router.Inquiry(http.MethodTrace, "/hello")
+		actual, params := router.inquiry(http.MethodTrace, "/hello")
 
 		if actual != nil || len(params) != 0 {
 			t.Errorf("\nhandler: expected nil, got %#v\nparams: expected {}, got %#v\n", actual, params)
@@ -43,10 +43,10 @@ func TestStaticRouter(t *testing.T) {
 	})
 
 	t.Run("should get nothing when inquiry for router given incorrect path", func(t *testing.T) {
-		router := NewRouter()
-		router.Register(http.MethodGet, "/hello", h)
+		router := newRouter()
+		router.register(http.MethodGet, "/hello", h)
 
-		actual, params := router.Inquiry(http.MethodGet, "/hello/world")
+		actual, params := router.inquiry(http.MethodGet, "/hello/world")
 
 		if actual != nil || len(params) != 0 {
 			t.Errorf("\nhandler: expected nil, got %#v\nparams: expected {}, got %#v\n", actual, params)
@@ -59,10 +59,10 @@ func TestDynamicRouter(t *testing.T) {
 	h2 := handle{}
 
 	t.Run("", func(t *testing.T) {
-		router := NewRouter()
-		router.Register(http.MethodGet, "/", h1)
+		router := newRouter()
+		router.register(http.MethodGet, "/", h1)
 
-		actualHandler, _ := router.Inquiry(http.MethodGet, "/")
+		actualHandler, _ := router.inquiry(http.MethodGet, "/")
 
 		if actualHandler != h1 {
 			t.Errorf("expected: %#v, got: %#v\n", h1, actualHandler)
@@ -70,12 +70,12 @@ func TestDynamicRouter(t *testing.T) {
 	})
 
 	t.Run("", func(t *testing.T) {
-		router := NewRouter()
-		router.Register(http.MethodGet, "/hello/world", h1)
-		router.Register(http.MethodGet, "/hello/world/<name>", h2)
+		router := newRouter()
+		router.register(http.MethodGet, "/hello/world", h1)
+		router.register(http.MethodGet, "/hello/world/<name>", h2)
 		expectedParams := request.Params{"name": "ltoddy"}
 
-		actualHandler, actualParams := router.Inquiry(http.MethodGet, "/hello/world/ltoddy")
+		actualHandler, actualParams := router.inquiry(http.MethodGet, "/hello/world/ltoddy")
 
 		if len(actualParams) != len(expectedParams) && expectedParams["name"] != actualParams["name"] {
 			t.Errorf("expected: %#v, got: %#v\n", expectedParams, actualParams)
@@ -87,11 +87,11 @@ func TestDynamicRouter(t *testing.T) {
 	})
 
 	t.Run("", func(t *testing.T) {
-		router := NewRouter()
-		router.Register(http.MethodGet, "/<id>/<name>", h1)
+		router := newRouter()
+		router.register(http.MethodGet, "/<id>/<name>", h1)
 		expectedParams := request.Params{"id": "10", "name": "ltoddy"}
 
-		actualHandler, actualParams := router.Inquiry(http.MethodGet, "/10/ltoddy")
+		actualHandler, actualParams := router.inquiry(http.MethodGet, "/10/ltoddy")
 
 		if actualHandler != h1 {
 			t.Errorf("expected: %#v, got: %#v\n", h1, actualHandler)

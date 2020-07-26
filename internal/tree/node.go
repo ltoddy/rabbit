@@ -1,7 +1,7 @@
 package tree
 
 import (
-	"github.com/ltoddy/rabbit/handler"
+	"github.com/ltoddy/rabbit/internal"
 	"regexp"
 	"strings"
 )
@@ -12,10 +12,10 @@ type trieNode struct {
 	subpath  string
 	children []*trieNode
 	dynamic  bool
-	fn       handler.Handler
+	fn       internal.Handler
 }
 
-func NewTrieNode(fullpath string, subpath string, fn handler.Handler) *trieNode {
+func NewTrieNode(fullpath string, subpath string, fn internal.Handler) *trieNode {
 	dynamic := isDynamicSubPath(subpath)
 
 	return &trieNode{
@@ -27,7 +27,7 @@ func NewTrieNode(fullpath string, subpath string, fn handler.Handler) *trieNode 
 	}
 }
 
-func (node *trieNode) Insert(fullpath string, subpaths []string, fn handler.Handler, level int) {
+func (node *trieNode) Insert(fullpath string, subpaths []string, fn internal.Handler, level int) {
 	if len(subpaths) == level {
 		node.fullpath = fullpath
 		node.fn = fn

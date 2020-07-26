@@ -1,18 +1,18 @@
-package router
+package rabbit
 
 import (
-	"github.com/ltoddy/rabbit/handler"
+	"github.com/ltoddy/rabbit/internal"
+	"github.com/ltoddy/rabbit/internal/tree"
 	"github.com/ltoddy/rabbit/request"
-	"github.com/ltoddy/rabbit/tree"
 	"net/http"
 )
 
-type Router struct {
+type router struct {
 	// Key: http method
 	roots map[string]*tree.TrieTree
 }
 
-func NewRouter() *Router {
+func newRouter() *router {
 	roots := make(map[string]*tree.TrieTree)
 	roots[http.MethodGet] = tree.NewTrieTree()
 	roots[http.MethodHead] = tree.NewTrieTree()
@@ -23,16 +23,16 @@ func NewRouter() *Router {
 	roots[http.MethodConnect] = tree.NewTrieTree()
 	roots[http.MethodOptions] = tree.NewTrieTree()
 	roots[http.MethodTrace] = tree.NewTrieTree()
-	return &Router{roots}
+	return &router{roots}
 }
 
-func (router *Router) Register(method string, path string, handler handler.Handler) {
+func (router *router) register(method string, path string, handler internal.Handler) {
 	root := router.roots[method]
 
 	root.Insert(path, handler)
 }
 
-func (router *Router) Inquiry(method string, path string) (handler.Handler, request.Params) {
+func (router *router) inquiry(method string, path string) (internal.Handler, request.Params) {
 	root := router.roots[method]
 
 	return root.Search(path)
